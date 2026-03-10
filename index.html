@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Catálogo | Tienda</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.svg">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        border: "hsl(214.3 31.8% 91.4%)",
+                        input: "hsl(214.3 31.8% 91.4%)",
+                        ring: "hsl(221.2 83.2% 53.3%)",
+                        background: "hsl(0 0% 100%)",
+                        foreground: "hsl(222.2 84% 4.9%)",
+                        primary: { DEFAULT: "hsl(222.2 47.4% 11.2%)", foreground: "hsl(210 40% 98%)" },
+                        secondary: { DEFAULT: "hsl(210 40% 96.1%)", foreground: "hsl(222.2 47.4% 11.2%)" },
+                        muted: { DEFAULT: "hsl(210 40% 96.1%)", foreground: "hsl(215.4 16.3% 46.9%)" },
+                        card: { DEFAULT: "hsl(0 0% 100%)", foreground: "hsl(222.2 84% 4.9%)" },
+                        accent: { DEFAULT: "hsl(210 40% 96.1%)", foreground: "hsl(222.2 47.4% 11.2%)" }
+                    },
+                    borderRadius: { lg: "0.5rem", md: "calc(0.5rem - 2px)", sm: "calc(0.5rem - 4px)" }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body { 
+                @apply bg-background text-foreground antialiased selection:bg-primary/10; 
+                -webkit-tap-highlight-color: transparent; 
+            }
+        }
+        @layer components {
+            .shadcn-btn { 
+                @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2; 
+            }
+            .shadcn-btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
+            .shadcn-btn-outline { @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground; }
+            .shadcn-btn-icon { @apply h-10 w-10 p-0; }
+            .shadcn-card { @apply rounded-xl border bg-card text-card-foreground shadow-sm; }
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .translate-y-0 { transform: translateY(0); }
+        .translate-y-full { transform: translateY(100%); }
+        
+        html, body { overscroll-behavior-y: none; }
+    </style>
+</head>
+<body class="min-h-screen pb-24 flex flex-col pt-safe">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+        <div class="container max-w-5xl mx-auto flex h-14 items-center px-4 justify-between">
+            <div class="font-bold text-lg flex items-center gap-2 tracking-tight">
+                <i data-lucide="store" class="w-5 h-5"></i>
+                Catálogo
+            </div>
+            <button id="cart-btn" class="shadcn-btn shadcn-btn-outline relative px-3 shadow-sm active:scale-95 transition-transform">
+                <i data-lucide="shopping-cart" class="w-4 h-4 sm:mr-2"></i>
+                <span class="hidden sm:inline">Ver Carrito</span>
+                <span id="cart-badge" class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground font-bold hidden shadow-sm border border-background">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 container max-w-5xl mx-auto px-4 pt-6">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold tracking-tight mb-1 hidden sm:block">Nuestros Productos</h1>
+            <p class="text-muted-foreground text-sm">Explora nuestra selección. Añade al carrito y finaliza tu pedido directamente en WhatsApp.</p>
+        </div>
+        
+        <!-- Products Grid -->
+        <div id="products-grid" class="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <!-- Rendered via JS -->
+            <div class="flex items-center justify-center h-40 col-span-full">
+                <i data-lucide="loader-2" class="w-6 h-6 animate-spin text-muted-foreground/50"></i>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Drawer (Overlay) -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm hidden flex-col justify-end transition-opacity duration-300 opacity-0">
+        <div class="bg-background border-t rounded-t-2xl sm:rounded-2xl sm:mb-4 h-[85vh] sm:h-[80vh] flex flex-col shadow-2xl w-full max-w-md mx-auto relative translate-y-full transition-transform duration-300 ease-out" id="cart-drawer-content">
+            
+            <!-- Drawer Header -->
+            <div class="px-5 py-4 border-b flex justify-between items-center bg-background rounded-t-2xl">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 text-primary"></i>
+                    <h2 class="font-semibold text-lg tracking-tight">Tu Pedido</h2>
+                </div>
+                <button id="close-cart-btn" class="shadcn-btn shadcn-btn-icon shadcn-btn-outline rounded-full h-8 w-8 hover:bg-muted active:scale-95">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <!-- Items List -->
+            <div class="flex-1 overflow-y-auto p-5 no-scrollbar flex flex-col gap-4" id="cart-items">
+                <!-- Items injected here -->
+            </div>
+            
+            <!-- Drawer Footer -->
+            <div class="border-t p-5 bg-background shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-8 sm:pb-5">
+                <div class="flex justify-between font-semibold mb-4 text-lg">
+                    <span class="text-muted-foreground">Total</span>
+                    <span id="cart-total" class="tracking-tight text-xl">$0.00</span>
+                </div>
+                <button id="checkout-btn" class="shadcn-btn w-full bg-[#25D366] text-white hover:bg-[#128C7E] h-12 text-base font-semibold gap-2 shadow-sm rounded-xl active:scale-95 transition-all">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    Pedir por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification structure (Hidden by default) -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none">
+        <div class="bg-foreground text-background px-4 py-2 rounded-full shadow-lg text-sm font-medium flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-[#25D366]"></i>
+            <span>Agregado al carrito</span>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        lucide.createIcons();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered!', reg))
+                    .catch(err => console.log('SW registration failed', err));
+            });
+        }
+    </script>
+</body>
+</html>

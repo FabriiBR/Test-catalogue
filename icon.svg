@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- Dark Blue/Slate Background matching shadcn primary -->
+    <rect width="512" height="512" fill="#0f172a" rx="100"/>
+    
+    <!-- White Shopping Bag Icon -->
+    <path fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" d="M112 160l-64 80v208a32 32 0 0 0 32 32h352a32 32 0 0 0 32-32V240l-64-80Z"/>
+    <path fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" d="M48 240h416"/>
+    <path fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" d="M336 240a80 80 0 0 1-160 0"/>
+</svg>
