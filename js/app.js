@@ -1,4 +1,3 @@
-// You can replace these products with your actual inventory
 const products = [
     { id: 1, name: "Camiseta Básica Premium", price: 15.00, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80" },
     { id: 2, name: "Gorra de Béisbol Classic", price: 20.00, image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80" },
@@ -11,8 +10,15 @@ const products = [
 ];
 
 let cart = [];
-// Put the business WhatsApp number here (include country code, without '+' or spaces)
 const PHONE_NUMBER = "1234567890"; 
+
+// SVG icons as strings to replace the generic fetch
+const icons = {
+    emptyCart: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`,
+    plus: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`,
+    minus: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`,
+    trash: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>`
+};
 
 const formatMoney = (amount) => {
     return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
@@ -21,14 +27,14 @@ const formatMoney = (amount) => {
 function renderProducts() {
     const grid = document.getElementById('products-grid');
     grid.innerHTML = products.map(p => `
-        <div class="shadcn-card flex flex-col overflow-hidden group hover:shadow-md transition-shadow duration-200">
-            <div class="aspect-[4/5] bg-muted relative overflow-hidden">
-                <img src="${p.image}" alt="${p.name}" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+        <div class="card">
+            <div class="card-img-wrap">
+                <img src="${p.image}" alt="${p.name}" loading="lazy" />
             </div>
-            <div class="p-4 flex flex-col flex-1 gap-2">
-                <h3 class="font-medium text-sm line-clamp-2 leading-tight flex-1">${p.name}</h3>
-                <p class="font-bold text-base tracking-tight">${formatMoney(p.price)}</p>
-                <button onclick="addToCart(${p.id})" class="shadcn-btn shadcn-btn-primary w-full mt-1 h-9 rounded-lg shadow-sm active:scale-95 transition-transform text-xs font-semibold">
+            <div class="card-body">
+                <h3 class="card-title">${p.name}</h3>
+                <p class="card-price">${formatMoney(p.price)}</p>
+                <button onclick="addToCart(${p.id})" class="btn btn-primary" style="width: 100%; margin-top: auto;">
                     Añadir
                 </button>
             </div>
@@ -43,7 +49,6 @@ function updateCartUI() {
     if (totalItems > 0) {
         badge.textContent = totalItems > 99 ? '99+' : totalItems;
         badge.classList.remove('hidden');
-        badge.classList.add('animate-in', 'zoom-in', 'duration-200');
     } else {
         badge.classList.add('hidden');
     }
@@ -51,37 +56,33 @@ function updateCartUI() {
     const cartItemsContainer = document.getElementById('cart-items');
     if (cart.length === 0) {
         cartItemsContainer.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-full text-muted-foreground/50 py-12 gap-3">
-                <div class="bg-muted p-4 rounded-full">
-                    <i data-lucide="shopping-cart" class="w-8 h-8"></i>
-                </div>
-                <p class="font-medium text-foreground">Tu carrito está vacío</p>
-                <p class="text-sm text-center px-6">Agrega productos para comenzar tu pedido.</p>
+            <div class="empty-cart">
+                <div class="empty-icon">${icons.emptyCart}</div>
+                <p style="font-weight: 500; font-size: 1rem; color: var(--foreground);">Tu carrito está vacío</p>
+                <p style="font-size: 0.875rem;">Agrega productos para comenzar tu pedido.</p>
             </div>
         `;
     } else {
         cartItemsContainer.innerHTML = cart.map(item => `
-            <div class="flex gap-4 p-3 rounded-xl border border-border/50 bg-background hover:bg-muted/30 transition-colors items-center">
-                <img src="${item.image}" class="w-20 h-20 rounded-lg object-cover bg-muted" alt="${item.name}" />
-                <div class="flex-1 min-w-0">
-                    <p class="font-semibold text-sm leading-tight truncate px-1">${item.name}</p>
-                    <p class="text-sm text-muted-foreground mt-1 px-1 font-medium">${formatMoney(item.price)}</p>
+            <div class="cart-item">
+                <img src="${item.image}" alt="${item.name}" />
+                <div class="cart-item-info">
+                    <p class="cart-item-title">${item.name}</p>
+                    <p class="cart-item-price">${formatMoney(item.price)}</p>
                     
-                    <div class="flex items-center gap-3 mt-2 bg-muted/50 w-fit rounded-lg p-1 border">
-                        <button onclick="updateQty(${item.id}, -1)" class="w-7 h-7 flex items-center justify-center rounded-md bg-background text-foreground shadow-sm hover:bg-muted active:scale-95 transition-all">
-                            <i data-lucide="${item.quantity === 1 ? 'trash-2' : 'minus'}" class="w-3.5 h-3.5 ${item.quantity === 1 ? 'text-destructive' : ''}"></i>
+                    <div class="cart-qty">
+                        <button onclick="updateQty(${item.id}, -1)" class="${item.quantity === 1 ? 'warn' : ''}">
+                            ${item.quantity === 1 ? icons.trash : icons.minus}
                         </button>
-                        <span class="text-sm font-semibold w-5 text-center">${item.quantity}</span>
-                        <button onclick="updateQty(${item.id}, 1)" class="w-7 h-7 flex items-center justify-center rounded-md bg-background text-foreground shadow-sm hover:bg-muted active:scale-95 transition-all">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQty(${item.id}, 1)">
+                            ${icons.plus}
                         </button>
                     </div>
                 </div>
             </div>
         `).join('');
     }
-    
-    lucide.createIcons();
     
     const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     document.getElementById('cart-total').textContent = formatMoney(total);
@@ -99,21 +100,15 @@ function addToCart(productId) {
     
     updateCartUI();
     showToast();
-    
-    const btn = document.getElementById('cart-btn');
-    btn.classList.add('ring-2', 'ring-primary/50', 'scale-105');
-    setTimeout(() => btn.classList.remove('ring-2', 'ring-primary/50', 'scale-105'), 200);
 }
 
 function showToast() {
     const toast = document.getElementById('toast');
-    toast.classList.remove('opacity-0', 'translate-y-4');
-    toast.classList.add('opacity-100', 'translate-y-0');
+    toast.classList.add('show');
     
     if(window.toastTimeout) clearTimeout(window.toastTimeout);
     window.toastTimeout = setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-4');
-        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.remove('show');
     }, 2000);
 }
 
@@ -130,33 +125,17 @@ function updateQty(productId, delta) {
 
 // Drawer logic
 const cartDrawer = document.getElementById('cart-drawer');
-const cartDrawerContent = document.getElementById('cart-drawer-content');
 const openBtn = document.getElementById('cart-btn');
 const closeBtn = document.getElementById('close-cart-btn');
 
 function openDrawer() {
-    cartDrawer.classList.remove('hidden');
-    // Force reflow
-    void cartDrawer.offsetWidth;
-    cartDrawer.classList.remove('opacity-0');
-    cartDrawer.classList.add('flex', 'opacity-100');
-    
-    setTimeout(() => {
-        cartDrawerContent.classList.remove('translate-y-full');
-        cartDrawerContent.classList.add('translate-y-0');
-    }, 10);
+    cartDrawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeDrawer() {
-    cartDrawerContent.classList.remove('translate-y-0');
-    cartDrawerContent.classList.add('translate-y-full');
-    cartDrawer.classList.remove('opacity-100');
-    cartDrawer.classList.add('opacity-0');
-    
-    setTimeout(() => {
-        cartDrawer.classList.add('hidden');
-        cartDrawer.classList.remove('flex');
-    }, 300);
+    cartDrawer.classList.remove('open');
+    document.body.style.overflow = '';
 }
 
 openBtn.addEventListener('click', openDrawer);
@@ -180,7 +159,6 @@ document.getElementById('checkout-btn').addEventListener('click', () => {
     window.location.href = `https://wa.me/${PHONE_NUMBER}?text=${text}`;
 });
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     renderProducts();
     updateCartUI();
