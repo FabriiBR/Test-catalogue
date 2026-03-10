@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -20,121 +20,190 @@
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon.svg">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        border: "hsl(214.3 31.8% 91.4%)",
-                        input: "hsl(214.3 31.8% 91.4%)",
-                        ring: "hsl(221.2 83.2% 53.3%)",
-                        background: "hsl(0 0% 100%)",
-                        foreground: "hsl(222.2 84% 4.9%)",
-                        primary: { DEFAULT: "hsl(222.2 47.4% 11.2%)", foreground: "hsl(210 40% 98%)" },
-                        secondary: { DEFAULT: "hsl(210 40% 96.1%)", foreground: "hsl(222.2 47.4% 11.2%)" },
-                        muted: { DEFAULT: "hsl(210 40% 96.1%)", foreground: "hsl(215.4 16.3% 46.9%)" },
-                        card: { DEFAULT: "hsl(0 0% 100%)", foreground: "hsl(222.2 84% 4.9%)" },
-                        accent: { DEFAULT: "hsl(210 40% 96.1%)", foreground: "hsl(222.2 47.4% 11.2%)" }
-                    },
-                    borderRadius: { lg: "0.5rem", md: "calc(0.5rem - 2px)", sm: "calc(0.5rem - 4px)" }
-                }
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer base {
-            body { 
-                @apply bg-background text-foreground antialiased selection:bg-primary/10; 
-                -webkit-tap-highlight-color: transparent; 
-            }
-        }
-        @layer components {
-            .shadcn-btn { 
-                @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2; 
-            }
-            .shadcn-btn-primary { @apply bg-primary text-primary-foreground hover:bg-primary/90; }
-            .shadcn-btn-outline { @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground; }
-            .shadcn-btn-icon { @apply h-10 w-10 p-0; }
-            .shadcn-card { @apply rounded-xl border bg-card text-card-foreground shadow-sm; }
+    <!-- Critical Inline CSS para Carga Instantánea -->
+    <style>
+        :root {
+            --background: #ffffff;
+            --foreground: #020817;
+            --primary: #0f172a;
+            --primary-foreground: #f8fafc;
+            --muted: #f1f5f9;
+            --muted-foreground: #64748b;
+            --border: #e2e8f0;
+            --card: #ffffff;
+            --destructive: #ef4444;
         }
         
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .translate-y-0 { transform: translateY(0); }
-        .translate-y-full { transform: translateY(100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html, body { overscroll-behavior-y: none; }
+        
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--background);
+            color: var(--foreground);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 6rem;
+            padding-top: env(safe-area-inset-top);
+        }
+        
+        button { font-family: inherit; border: none; background: none; cursor: pointer; outline: none; }
+        .hidden { display: none !important; }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 0.25rem; }
+        p.desc { color: var(--muted-foreground); font-size: 0.875rem; }
+        
+        .container { width: 100%; max-width: 64rem; margin: 0 auto; padding: 0 1rem; }
+        
+        .header {
+            position: sticky; top: 0; z-index: 40; width: 100%;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .header-content { display: flex; height: 3.5rem; align-items: center; justify-content: space-between; }
+        .logo { font-weight: 700; font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.025em; }
+        .logo svg { width: 1.25rem; height: 1.25rem; }
+        
+        .main { flex: 1; padding-top: 1.5rem; }
+        .grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        @media (min-width: 640px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; } }
+        
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500;
+            height: 2.5rem; padding: 0 1rem; transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: var(--primary); color: var(--primary-foreground); }
+        .btn-outline { border: 1px solid var(--border); background: var(--background); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-icon-only { width: 2.5rem; padding: 0; border-radius: 9999px; }
+        .btn svg { width: 1.25rem; height: 1.25rem; }
+        
+        .cart-btn-wrap { position: relative; }
+        .cart-badge {
+            position: absolute; top: -0.5rem; right: -0.5rem;
+            height: 1.25rem; width: 1.25rem; display: flex; align-items: center; justify-content: center;
+            border-radius: 9999px; background: var(--primary); color: var(--primary-foreground);
+            font-size: 0.625rem; font-weight: 700; border: 1px solid var(--background);
+        }
+        
+        .card { border-radius: 0.75rem; border: 1px solid var(--border); background: var(--card); overflow: hidden; display: flex; flex-direction: column; }
+        .card-img-wrap { aspect-ratio: 4/5; background: var(--muted); position: relative; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 1rem; display: flex; flex-direction: column; flex: 1; gap: 0.5rem; }
+        .card-title { font-weight: 500; font-size: 0.875rem; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+        .card-price { font-weight: 700; font-size: 1rem; letter-spacing: -0.025em; }
+        
+        .drawer-overlay {
+            position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+        .drawer-content {
+            background: var(--background); border-radius: 1.25rem 1.25rem 0 0; height: 85vh; width: 100%; max-width: 28rem;
+            margin: 0 auto; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .drawer-overlay.open .drawer-content { transform: translateY(0); }
+        .drawer-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .drawer-title { font-weight: 600; font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary); }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+        .drawer-body::-webkit-scrollbar { display: none; }
+        .drawer-footer { padding: 1.25rem; border-top: 1px solid var(--border); box-shadow: 0 -10px 40px -15px rgba(0,0,0,0.1); padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); }
+        .drawer-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 1.25rem; margin-bottom: 1rem; letter-spacing: -0.025em; }
+        .drawer-total span:first-child { color: var(--muted-foreground); font-weight: 600; }
+        .btn-whatsapp { background: #25D366; color: white; width: 100%; font-size: 1rem; font-weight: 600; height: 3rem; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(37, 211, 102, 0.2); }
+        
+        .cart-item { display: flex; gap: 1rem; padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border); background: var(--background); align-items: center; }
+        .cart-item img { width: 5rem; height: 5rem; border-radius: 0.5rem; object-fit: cover; background: var(--muted); }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-title { font-weight: 600; font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
+        .cart-item-price { font-size: 0.875rem; color: var(--muted-foreground); font-weight: 500; margin-top: 0.25rem; }
+        .cart-qty { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; background: var(--muted); width: fit-content; padding: 0.25rem; border-radius: 0.5rem; border: 1px solid var(--border); }
+        .cart-qty button { width: 1.75rem; height: 1.75rem; border-radius: 0.375rem; background: var(--background); box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; color: var(--foreground); }
+        .cart-qty button.warn { color: var(--destructive); }
+        .cart-qty button:active { transform: scale(0.95); }
+        .cart-qty button svg { width: 14px; height: 14px; }
+        .cart-qty span { font-size: 0.875rem; font-weight: 600; min-width: 1.25rem; text-align: center; }
+        
+        .empty-cart { display: flex; flex-direction: column; items-center: center; justify-content: center; height: 100%; text-align: center; color: var(--muted-foreground); gap: 0.75rem; padding: 2rem 0; align-items: center; }
+        .empty-icon { background: var(--muted); padding: 1rem; border-radius: 9999px; }
+        
+        .toast { position: fixed; bottom: 1rem; left: 50%; transform: translate(-50%, 1rem); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 50; pointer-events: none; }
+        .toast.show { transform: translate(-50%, 0); opacity: 1; }
+        .toast-content { background: var(--foreground); color: var(--background); padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .text-whatsapp { color: #25D366; }
     </style>
 </head>
-<body class="min-h-screen pb-24 flex flex-col pt-safe">
+<body>
 
     <!-- Header -->
-    <header class="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-        <div class="container max-w-5xl mx-auto flex h-14 items-center px-4 justify-between">
-            <div class="font-bold text-lg flex items-center gap-2 tracking-tight">
-                <i data-lucide="store" class="w-5 h-5"></i>
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></svg>
                 Catálogo
             </div>
-            <button id="cart-btn" class="shadcn-btn shadcn-btn-outline relative px-3 shadow-sm active:scale-95 transition-transform">
-                <i data-lucide="shopping-cart" class="w-4 h-4 sm:mr-2"></i>
-                <span class="hidden sm:inline">Ver Carrito</span>
-                <span id="cart-badge" class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground font-bold hidden shadow-sm border border-background">0</span>
+            <button id="cart-btn" class="btn btn-outline cart-btn-wrap">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                <span class="desktop-only" style="display: none;">Ver Carrito</span>
+                <span id="cart-badge" class="cart-badge hidden">0</span>
             </button>
+            <style>@media(min-width: 640px){.desktop-only{display: inline !important;}}</style>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 container max-w-5xl mx-auto px-4 pt-6">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold tracking-tight mb-1 hidden sm:block">Nuestros Productos</h1>
-            <p class="text-muted-foreground text-sm">Explora nuestra selección. Añade al carrito y finaliza tu pedido directamente en WhatsApp.</p>
+    <main class="main container">
+        <div style="margin-bottom: 1.5rem;">
+            <h1>Nuestros Productos</h1>
+            <p class="desc">Añade al carrito y finaliza tu pedido directamente en WhatsApp.</p>
         </div>
         
         <!-- Products Grid -->
-        <div id="products-grid" class="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            <!-- Rendered via JS -->
-            <div class="flex items-center justify-center h-40 col-span-full">
-                <i data-lucide="loader-2" class="w-6 h-6 animate-spin text-muted-foreground/50"></i>
+        <div id="products-grid" class="grid">
+            <div style="grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; height: 10rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite; color: var(--muted-foreground);"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
             </div>
         </div>
     </main>
 
     <!-- Cart Drawer (Overlay) -->
-    <div id="cart-drawer" class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm hidden flex-col justify-end transition-opacity duration-300 opacity-0">
-        <div class="bg-background border-t rounded-t-2xl sm:rounded-2xl sm:mb-4 h-[85vh] sm:h-[80vh] flex flex-col shadow-2xl w-full max-w-md mx-auto relative translate-y-full transition-transform duration-300 ease-out" id="cart-drawer-content">
-            
+    <div id="cart-drawer" class="drawer-overlay">
+        <div class="drawer-content" id="cart-drawer-content">
             <!-- Drawer Header -->
-            <div class="px-5 py-4 border-b flex justify-between items-center bg-background rounded-t-2xl">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="shopping-bag" class="w-5 h-5 text-primary"></i>
-                    <h2 class="font-semibold text-lg tracking-tight">Tu Pedido</h2>
-                </div>
-                <button id="close-cart-btn" class="shadcn-btn shadcn-btn-icon shadcn-btn-outline rounded-full h-8 w-8 hover:bg-muted active:scale-95">
-                    <i data-lucide="x" class="w-4 h-4"></i>
+            <div class="drawer-header">
+                <h2 class="drawer-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    Tu Pedido
+                </h2>
+                <button id="close-cart-btn" class="btn btn-outline btn-icon-only">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             
             <!-- Items List -->
-            <div class="flex-1 overflow-y-auto p-5 no-scrollbar flex flex-col gap-4" id="cart-items">
+            <div class="drawer-body" id="cart-items">
                 <!-- Items injected here -->
             </div>
             
             <!-- Drawer Footer -->
-            <div class="border-t p-5 bg-background shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-8 sm:pb-5">
-                <div class="flex justify-between font-semibold mb-4 text-lg">
-                    <span class="text-muted-foreground">Total</span>
-                    <span id="cart-total" class="tracking-tight text-xl">$0.00</span>
+            <div class="drawer-footer">
+                <div class="drawer-total">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
                 </div>
-                <button id="checkout-btn" class="shadcn-btn w-full bg-[#25D366] text-white hover:bg-[#128C7E] h-12 text-base font-semibold gap-2 shadow-sm rounded-xl active:scale-95 transition-all">
-                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                <button id="checkout-btn" class="btn btn-whatsapp">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
                     Pedir por WhatsApp
                 </button>
             </div>
@@ -142,20 +211,18 @@
     </div>
 
     <!-- Toast Notification structure (Hidden by default) -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none">
-        <div class="bg-foreground text-background px-4 py-2 rounded-full shadow-lg text-sm font-medium flex items-center gap-2">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-[#25D366]"></i>
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <svg class="text-whatsapp" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
             <span>Agregado al carrito</span>
         </div>
     </div>
 
     <script src="js/app.js"></script>
     <script>
-        lucide.createIcons();
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('SW registered!', reg))
                     .catch(err => console.log('SW registration failed', err));
             });
         }
